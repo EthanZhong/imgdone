@@ -1,7 +1,7 @@
 /**
  * @author EthanZhong
  */
-import * as EXIF from 'exif-js';
+import { EXIF } from 'exif-js';
 
 let ImgFile = {
     /**
@@ -118,12 +118,17 @@ let ImgFile = {
             }
             /* 图片加载成功 */
             _img.onload = () => {
+                /* 清除照片透明区域 */
+                let _withOutTransparent = _self.cleanVTransparent(_img);
                 /* 照片拍摄旋转方向 */
-                EXIF.getData(_img, function () {
-                    let _orientation = EXIF.getTag(this, 'Orientation');
-                    let _withOutTransparent = _self.cleanVTransparent(_img);
+                let _flag = EXIF.getData(_img, function () {
+                    let _orientation = EXIF.getTag(_img, 'Orientation');
                     resolve((typeof _orientation == 'undefined') ? _withOutTransparent : _self.rightOrientation(_withOutTransparent, _orientation));
                 });
+                /* 获取照片信息失败 */
+                if (!_flag) {
+                    resolve(_withOutTransparent);
+                }
             }
             /* 图片加载失败 */
             _img.onerror = (err) => {
@@ -134,5 +139,4 @@ let ImgFile = {
         });
     }
 };
-
-export { ImgFile };
+export default ImgFile;

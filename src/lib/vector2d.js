@@ -1,7 +1,7 @@
 /**
  * @author EthanZhong
  */
-class Vector2d {
+export default class Vector2d {
     constructor(x, y) {
         this.x = x || 0;
         this.y = y || 0;
@@ -59,5 +59,3 @@ class Vector2d {
         return new Vector2d(this.x, this.y);
     }
 }
-
-export { Vector2d };

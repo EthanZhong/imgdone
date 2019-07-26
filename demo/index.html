@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=640,target-densitydpi=device-dpi,user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Demo</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        ul,
+        ol,
+        li {
+            list-style: none;
+        }
+
+        div,
+        ul,
+        li,
+        p,
+        input {
+            padding: 0;
+            margin: 0;
+            border: 0;
+        }
+
+        input {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: transparent;
+        }
+
+        .af-module {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .view {
+            width: 300px;
+            height: 300px;
+            border: 1px solid red;
+        }
+
+        .stage {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            background-color: black;
+            overflow: hidden;
+            margin-top: 50px;
+        }
+
+        .btn-ul {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .btn-li {
+            position: relative;
+            width: 200px;
+            height: 50px;
+            margin: 0 10px;
+            display: inline-block;
+            background-color: gray;
+            color: white;
+            font-size: 25px;
+            line-height: 50px;
+        }
+
+        .file-input {
+            opacity: 0;
+        }
+
+        .hit-area {
+            background-color: black;
+            opacity: 0;
+        }
+    </style>
+    <script src="../dist/imgdone.umd.js"></script>
+    <script>
+        var imgEdit;
+        function onFileChange(evt) {
+            if (evt.target.files.length > 0) {
+                ImgDone.ImgFile.handle(evt.target.files[0]).then(
+                    res => {
+                        if (!imgEdit) {
+                            imgEdit = new ImgDone.ImgEdit(document.querySelector('.mycanvas'), res);
+                        } else {
+                            imgEdit.restSource(res).reset();
+                        }
+                    },
+                    () => {
+                        alert('图片获取失败');
+                    }
+                );
+            }
+        }
+        function onSubmit() {
+            if (imgEdit) {
+                document.querySelector('.view').src = imgEdit.canvas.toDataURL("image/jpeg", 1);
+            }
+        }
+        function init() {
+            document.querySelector('.file-input').addEventListener('change', onFileChange);
+            document.querySelector('.submit-btn').addEventListener('click', onSubmit);
+        }
+    </script>
+</head>
+
+<body onload="init();" ontouchmove="return false;">
+    <div class="container">
+        <img class="view" />
+        <div class="stage">
+            <canvas class="mycanvas af-module" width="450" height="450"></canvas>
+            <div class="hit-area af-module"></div>
+        </div>
+        <ul class="btn-ul">
+            <li class="btn-li">
+                选择图片
+                <input class="file-input af-module" type="file" accept="image/*" />
+            </li>
+            <li class="btn-li submit-btn">
+                确认
+            </li>
+        </ul>
+    </div>
+</body>
+
+</html>

@@ -1,9 +1,9 @@
 /**
  * @author EthanZhong
  */
-import { Vector2d } from './vector2d';
+import Vector2d from './vector2d';
 
-class ImgEdit {
+export default class ImgEdit {
     constructor(canvas, source) {
         this.resetCanvas(canvas);
         this.restSource(source);
@@ -61,5 +61,3 @@ class ImgEdit {
         return radian * 180 / Math.PI;
     }
 }
-
-export { ImgEdit };
