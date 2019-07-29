@@ -101,15 +101,63 @@
             opacity: 0;
         }
     </style>
-    <script src="../dist/imgdone.umd.js"></script>
+    <script src="./js/hammer.min.js"></script>
+    <script src="./js/imgdone.umd.js"></script>
     <script>
-        var imgEdit;
+        var imgEdit, hammerManager;
+        function createHammer() {
+            var _lastX = 0,
+                _lastY = 0;
+            var _lastScale = 0;
+            var _lastRotation = 0;
+
+            hammerManager = new Hammer.Manager(document.querySelector('.hit-area'), {
+                recognizers: [
+                    [Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
+                    [Hammer.Rotate],
+                    [Hammer.Pinch, {}, ["rotate"]]
+                ]
+            });
+            hammerManager.on("panstart", evt => {
+                _lastX = evt.deltaX;
+                _lastY = evt.deltaY;
+            });
+            hammerManager.on("panmove", evt => {
+                imgEdit.move(evt.deltaX - _lastX, evt.deltaY - _lastY);
+                _lastX = evt.deltaX;
+                _lastY = evt.deltaY;
+            });
+            hammerManager.on("pinchstart", evt => {
+                _lastScale = evt.scale;
+            });
+            hammerManager.on("pinchmove", evt => {
+                var _scale = imgEdit.scale + evt.scale - _lastScale;
+                if (_scale < imgEdit.minScale) {
+                    imgEdit.scale = imgEdit.minScale;
+                } else {
+                    imgEdit.scale = _scale;
+                }
+                imgEdit.render();
+                _lastScale = evt.scale;
+            });
+            hammerManager.on("rotatestart", evt => {
+                _lastRotation = evt.rotation;
+            });
+            hammerManager.on("rotatemove", evt => {
+                imgEdit.degree += evt.rotation - _lastRotation;
+                imgEdit.render();
+                _lastRotation = evt.rotation;
+            });
+
+            hammerManager.set({ enable: false });
+        }
         function onFileChange(evt) {
             if (evt.target.files.length > 0) {
                 ImgDone.ImgFile.handle(evt.target.files[0]).then(
                     res => {
                         if (!imgEdit) {
                             imgEdit = new ImgDone.ImgEdit(document.querySelector('.mycanvas'), res);
+                            hammerManager.set({ enable: true });
                         } else {
                             imgEdit.restSource(res).reset();
                         }
@@ -126,6 +174,7 @@
             }
         }
         function init() {
+            createHammer();
             document.querySelector('.file-input').addEventListener('change', onFileChange);
             document.querySelector('.submit-btn').addEventListener('click', onSubmit);
         }
